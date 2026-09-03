@@ -14,7 +14,7 @@ This repository contains the completed lab manual artifacts for **Real-Time Netw
 Each experiment notebook includes:
 
 - objective
-- textbook-style notes
+- complete textbook-style notes for real-time systems fundamentals
 - architecture explanation
 - formulas and required theory
 - in-lab execution
@@ -23,3 +23,5 @@ Each experiment notebook includes:
 - references/source notes
 
 The notebooks are already executed and include embedded outputs.
+
+The expanded notes cover real-time system definitions, hard/firm/soft classification, task and event types, timing parameters, timing constraints, latency, jitter, throughput, bounded communication, autonomous-system timing chains, formulas, architectures, and case-study interpretation.
