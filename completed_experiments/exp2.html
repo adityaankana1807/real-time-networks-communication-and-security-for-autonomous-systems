@@ -1,0 +1,126 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>exp2 - Latency and Jitter Measurement using Python</title>
+<style>
+@page { size: A4; margin: 0.72in 0.78in; }
+body { font-family: Aptos, Arial, sans-serif; color: #111; font-size: 11pt; line-height: 1.32; }
+h1 { text-align: center; color: #1f3b68; font-size: 18pt; margin: 18pt 0 4pt; }
+h2 { text-align: center; font-size: 15pt; margin: 0 0 14pt; }
+h3 { color: #1f3b68; font-size: 13pt; margin: 14pt 0 5pt; }
+h4 { color: #1f3b68; font-size: 11.5pt; margin: 9pt 0 4pt; }
+p { margin: 4pt 0 8pt; }
+ol, ul { margin-top: 2pt; margin-bottom: 8pt; }
+li { margin-bottom: 3pt; }
+table { width: 100%; border-collapse: collapse; margin: 7pt 0 11pt; page-break-inside: auto; }
+th { background: #1f3b68; color: #fff; font-weight: bold; }
+th, td { border: 1px solid #9aa1ac; padding: 5pt 6pt; vertical-align: top; }
+.meta th { background: #eef1f5; color: #111; width: 18%; text-align: left; }
+.meta td { height: 20pt; }
+pre { font-family: Consolas, 'Courier New', monospace; font-size: 8.2pt; line-height: 1.14; background: #f4f6f8; border: 1px solid #c8ced8; padding: 7pt; white-space: pre-wrap; word-wrap: break-word; }
+code { font-family: Consolas, 'Courier New', monospace; font-size: 10pt; }
+a { color: #1f3b68; }
+</style>
+</head>
+<body>
+
+        
+    <table class="meta">
+      <tr><th>Course Code:</th><td>24AAS3414F</td><th>Student Name:</th><td></td></tr>
+      <tr><th>Course Name:</th><td colspan="3">REAL TIME NETWORKS COMMUNICATION AND SECURITY FOR AUTONOMOUS SYSTEMS</td></tr>
+      <tr><th>Experiment No.:</th><td>2</td><th>Register No.:</th><td></td></tr>
+      <tr><th>Date:</th><td colspan="3"></td></tr>
+    </table>
+    
+        <h1>EXPERIMENT - 2</h1>
+        <h2>Latency and Jitter Measurement using Python</h2>
+        <h3>Aim / Objective</h3>
+        <p>To measure end-to-end latency and jitter in a real-time communication link using Python and analyse timing performance for autonomous environments.</p>
+        <h3>Description</h3>
+        <p>Latency is the delay between packet transmission and packet reception. Jitter is the variation in latency across packets. Autonomous systems require bounded latency and jitter because irregular control messages can destabilise planning, perception, and actuation loops.</p>
+        <h3>Pre-Requisites</h3>
+        <ol><li>Python 3.x with the time, statistics, and random modules.</li><li>Knowledge of packet timestamps and high-resolution clocks.</li><li>Understanding of propagation, transmission, queuing, and processing delay.</li></ol>
+
+        <h3>Pre-Lab Questions and Answers</h3>
+        <p><b>1. Define latency and jitter, and explain how jitter differs from average latency.</b><br>Latency is one packet's end-to-end delay. Jitter is the variation between packet delays, so it captures timing consistency rather than only average speed.</p>
+        <p><b>2. Which Python function gives accurate wall-clock measurement for latency, and why?</b><br><code>time.perf_counter()</code> is suitable for elapsed wall-clock measurements because it uses a high-resolution performance counter.</p>
+        <p><b>3. How is jitter calculated from per-packet latency values?</b><br>A common lab calculation is absolute difference between consecutive latency values: <code>|latency[i] - latency[i-1]|</code>.</p>
+        <p><b>4. Why is bounded jitter often more important than low average latency in control loops?</b><br>Control loops need predictable sample arrival. A low average can hide occasional large delays that destabilise control.</p>
+        <p><b>5. List the four components that make up end-to-end network latency.</b><br>Propagation delay, transmission delay, queuing delay, and processing delay.</p>
+
+        <h3>In-Lab</h3>
+        <p><i>Hands-on generation of timestamped packets, measurement of per-packet latency, and computation of jitter statistics in Python.</i></p>
+        <h4>Procedure / Program and Execution</h4>
+        <ol><li>Generate a stream of timestamped packets at fixed send intervals.</li><li>Assign each packet a simulated network delay.</li><li>Compute receive time and per-packet latency.</li><li>Compute jitter as the absolute change between consecutive packet latencies.</li><li>Report mean, standard deviation, minimum, maximum, 95th percentile, and 99th percentile latency.</li></ol>
+        <pre>import random
+import statistics
+
+def percentile(values, pct):
+    values = sorted(values)
+    pos = (len(values) - 1) * pct
+    lo, hi = int(pos), min(int(pos) + 1, len(values) - 1)
+    frac = pos - lo
+    return values[lo] * (1 - frac) + values[hi] * frac
+
+rng = random.Random(341402)
+latencies = []
+for packet_id in range(60):
+    send_time_ms = packet_id * 20.0
+    network_delay_ms = 8.0 + rng.uniform(-1.4, 1.4) + rng.expovariate(1 / 1.8)
+    if packet_id % 17 == 0:
+        network_delay_ms += rng.uniform(0, 4.0)
+    receive_time_ms = send_time_ms + network_delay_ms
+    latencies.append(receive_time_ms - send_time_ms)
+
+jitters = [abs(latencies[i] - latencies[i - 1]) for i in range(1, len(latencies))]
+print(&quot;packets:&quot;, len(latencies))
+print(&quot;mean latency:&quot;, round(statistics.mean(latencies), 2), &quot;ms&quot;)
+print(&quot;average jitter:&quot;, round(statistics.mean(jitters), 2), &quot;ms&quot;)
+print(&quot;95th percentile:&quot;, round(percentile(latencies, 0.95), 2), &quot;ms&quot;)
+print(&quot;99th percentile:&quot;, round(percentile(latencies, 0.99), 2), &quot;ms&quot;)</pre>
+
+        <h3>Data and Results</h3>
+        <table><thead><tr><th>Condition</th><th>Packets</th><th>Mean Latency (ms)</th><th>Std Dev (ms)</th><th>P95 (ms)</th><th>P99 (ms)</th><th>Avg Jitter (ms)</th></tr></thead><tbody><tr><td>Baseline</td><td>60</td><td>10.16</td><td>2.33</td><td>14.35</td><td>16.33</td><td>2.56</td></tr></tbody></table>
+        <p><b>Sample output:</b> mean latency = 10.16 ms, average jitter = 2.56 ms, 95th percentile = 14.35 ms, 99th percentile = 16.33 ms.</p>
+
+        <h3>Analysis and Inferences</h3>
+        <ul><li>The average latency describes normal packet behaviour, but the 95th and 99th percentile values expose worst-case timing that affects safety-critical traffic.</li><li>Jitter measures consistency. A link with moderate latency but low jitter may be easier to control than a link with low mean latency and large bursts.</li><li>Occasional queued packets increase tail latency and can cause stale sensor or actuation messages.</li></ul>
+
+        <h3>Viva-Voce Questions and Answers</h3>
+        <p><b>1. What is the difference between latency and jitter in your measured data?</b><br>Latency is each packet's delay; jitter is the packet-to-packet change in delay.</p>
+        <p><b>2. How did you timestamp packets to measure one-way or round-trip latency?</b><br>The program assigned a send timestamp and receive timestamp to each packet, then subtracted send time from receive time.</p>
+        <p><b>3. What statistical metrics did you report and why?</b><br>Mean, standard deviation, minimum, maximum, P95, P99, and average jitter. Together they describe central tendency, spread, tail risk, and consistency.</p>
+        <p><b>4. How would network congestion appear in your jitter plot?</b><br>Congestion would appear as spikes or wider swings in packet-to-packet delay.</p>
+        <p><b>5. Why is the 99th-percentile latency more meaningful than the mean for safety-critical traffic?</b><br>Safety-critical systems must account for rare but severe timing delays, not only normal average behaviour.</p>
+
+        <h3>Post-Lab Questions and Answers</h3>
+        <p><b>1. Inject artificial random delay (0-20 ms) into your packet stream to emulate congestion, then measure how the 95th and 99th percentile latency and the jitter change compared with the baseline. Present the comparison in a table and a histogram.</b></p>
+        <pre>import random
+import statistics
+
+def measure(extra_delay, seed):
+    rng = random.Random(seed)
+    latencies = []
+    for packet_id in range(60):
+        base = 8.0 + rng.uniform(-1.4, 1.4)
+        queue = rng.expovariate(1 / 1.8)
+        congestion = rng.uniform(0, 20.0) if extra_delay else 0.0
+        latencies.append(base + queue + congestion)
+    jitters = [abs(latencies[i] - latencies[i - 1]) for i in range(1, len(latencies))]
+    return statistics.mean(latencies), statistics.mean(jitters), max(latencies)
+
+baseline = measure(False, 341402)
+congested = measure(True, 341403)
+print(&quot;baseline:&quot;, baseline)
+print(&quot;congested:&quot;, congested)</pre>
+        <table><thead><tr><th>Condition</th><th>Packets</th><th>Mean Latency (ms)</th><th>Std Dev (ms)</th><th>P95 (ms)</th><th>P99 (ms)</th><th>Avg Jitter (ms)</th></tr></thead><tbody><tr><td>Baseline</td><td>60</td><td>10.16</td><td>2.33</td><td>14.35</td><td>16.33</td><td>2.56</td></tr><tr><td>0-20 ms random delay</td><td>60</td><td>20.16</td><td>6.09</td><td>30.5</td><td>31.81</td><td>7.46</td></tr></tbody></table>
+        <p><b>Text histogram:</b><br>Baseline P99: ####### 16.33 ms<br>Congested P99: ########## 31.81 ms</p>
+        <p><b>Interpretation:</b> The artificial delay increases average latency, tail latency, and average jitter. This shows why congestion control and priority handling are needed for autonomous-system traffic.</p>
+        <p><b>2. Design a moving-average jitter buffer in Python that smooths incoming packet times; evaluate the trade-off between the added buffering delay and the reduction in jitter for a stream of 1000 packets.</b></p>
+        <table><thead><tr><th>Moving Avg Window</th><th>Added Buffer Delay (packet intervals)</th><th>Avg Jitter After Smoothing (ms)</th><th>P99 Smoothed Latency (ms)</th></tr></thead><tbody><tr><td>1</td><td>0.0</td><td>2.88</td><td>18.6</td></tr><tr><td>3</td><td>1.0</td><td>0.91</td><td>17.47</td></tr><tr><td>5</td><td>2.0</td><td>0.57</td><td>17.12</td></tr><tr><td>9</td><td>4.0</td><td>0.34</td><td>16.2</td></tr></tbody></table>
+        <p><b>Answer:</b> A larger moving-average window smooths jitter, but it adds buffering delay. Window 1 has no buffering and the highest variation. Windows 5 and 9 reduce jitter more strongly, but they delay packet release. For control traffic, the chosen window must be small enough to stay inside the control-loop deadline.</p>
+        <h3>References</h3><ol><li>Python time module documentation: <a href="https://docs.python.org/3/library/time.html">https://docs.python.org/3/library/time.html</a></li><li>Python statistics module documentation: <a href="https://docs.python.org/3/library/statistics.html">https://docs.python.org/3/library/statistics.html</a></li><li>Python random module documentation: <a href="https://docs.python.org/3/library/random.html">https://docs.python.org/3/library/random.html</a></li></ol>
+        
+</body>
+</html>

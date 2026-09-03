@@ -1,0 +1,11 @@
+_docx_unzip_*/
+completed_experiments/_qa_*/
+_last_unzip_dir.txt
+_source_text.txt
+completed_experiments/_last_qa_dir.txt
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+
+# Earlier combined notebook kept locally; current deliverable uses separate notebooks.
+exp1_exp2_executed.ipynb

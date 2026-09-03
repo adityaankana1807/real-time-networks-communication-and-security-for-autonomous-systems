@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>exp1 - Simulation of Hard, Soft, and Firm Real-Time Tasks using Python</title>
+<style>
+@page { size: A4; margin: 0.72in 0.78in; }
+body { font-family: Aptos, Arial, sans-serif; color: #111; font-size: 11pt; line-height: 1.32; }
+h1 { text-align: center; color: #1f3b68; font-size: 18pt; margin: 18pt 0 4pt; }
+h2 { text-align: center; font-size: 15pt; margin: 0 0 14pt; }
+h3 { color: #1f3b68; font-size: 13pt; margin: 14pt 0 5pt; }
+h4 { color: #1f3b68; font-size: 11.5pt; margin: 9pt 0 4pt; }
+p { margin: 4pt 0 8pt; }
+ol, ul { margin-top: 2pt; margin-bottom: 8pt; }
+li { margin-bottom: 3pt; }
+table { width: 100%; border-collapse: collapse; margin: 7pt 0 11pt; page-break-inside: auto; }
+th { background: #1f3b68; color: #fff; font-weight: bold; }
+th, td { border: 1px solid #9aa1ac; padding: 5pt 6pt; vertical-align: top; }
+.meta th { background: #eef1f5; color: #111; width: 18%; text-align: left; }
+.meta td { height: 20pt; }
+pre { font-family: Consolas, 'Courier New', monospace; font-size: 8.2pt; line-height: 1.14; background: #f4f6f8; border: 1px solid #c8ced8; padding: 7pt; white-space: pre-wrap; word-wrap: break-word; }
+code { font-family: Consolas, 'Courier New', monospace; font-size: 10pt; }
+a { color: #1f3b68; }
+</style>
+</head>
+<body>
+
+        
+    <table class="meta">
+      <tr><th>Course Code:</th><td>24AAS3414F</td><th>Student Name:</th><td></td></tr>
+      <tr><th>Course Name:</th><td colspan="3">REAL TIME NETWORKS COMMUNICATION AND SECURITY FOR AUTONOMOUS SYSTEMS</td></tr>
+      <tr><th>Experiment No.:</th><td>1</td><th>Register No.:</th><td></td></tr>
+      <tr><th>Date:</th><td colspan="3"></td></tr>
+    </table>
+    
+        <h1>EXPERIMENT - 1</h1>
+        <h2>Simulation of Hard, Soft, and Firm Real-Time Tasks using Python</h2>
+        <h3>Aim / Objective</h3>
+        <p>To design and simulate hard, soft, and firm real-time tasks in Python, analyse their execution behaviour, and evaluate deadline satisfaction in autonomous and embedded systems.</p>
+        <h3>Description</h3>
+        <p>Real-time tasks are classified by the consequence of missing a deadline. Hard tasks must meet deadlines because failure can create unsafe behaviour. Firm tasks may finish late, but late results are discarded. Soft tasks can still be useful after a deadline, with reduced quality.</p>
+        <h3>Pre-Requisites</h3>
+        <ol><li>Python 3.x with a code editor or Jupyter notebook.</li><li>Knowledge of release time, execution time, period, and deadline.</li><li>Basic Python lists, dictionaries, loops, and functions.</li></ol>
+
+        <h3>Pre-Lab Questions and Answers</h3>
+        <p><b>1. Define hard, soft, and firm real-time tasks and give one autonomous-system example of each.</b><br>Hard: a missed deadline is unacceptable, such as emergency braking. Soft: late output is degraded but still useful, such as a dashboard status stream. Firm: late output has no value, such as a stale object-detection frame.</p>
+        <p><b>2. What is the difference between execution time (WCET) and a deadline?</b><br>Execution time is the processor time needed to complete the task. A deadline is the latest acceptable completion time after release.</p>
+        <p><b>3. How would you represent a task's timing parameters as a Python data structure?</b><br>A dictionary or dataclass can store name, task class, release time, execution time, period, and deadline.</p>
+        <p><b>4. What does deadline satisfaction ratio mean?</b><br>Deadline satisfaction ratio = number of jobs completed before deadline / total jobs.</p>
+        <p><b>5. Why can a firm real-time result be discarded even though it eventually completes?</b><br>Because the result describes a past system state and no longer supports the current control decision.</p>
+
+        <h3>In-Lab</h3>
+        <p><i>Hands-on simulation of hard, soft, and firm real-time tasks and measurement of deadline satisfaction in Python.</i></p>
+        <h4>Procedure / Program and Execution</h4>
+        <ol><li>Create a list of real-time jobs with release time, execution time, relative deadline, and task class.</li><li>Run a simple non-preemptive scheduler that executes each ready job in sequence.</li><li>Compute absolute deadline as release time plus relative deadline.</li><li>Mark each job as met or missed.</li><li>Compute deadline-miss ratio and compare hard, firm, and soft task behaviour.</li></ol>
+        <pre>tasks = [
+    {&quot;name&quot;: &quot;Brake actuator command&quot;, &quot;class&quot;: &quot;Hard&quot;, &quot;release&quot;: 0, &quot;exec&quot;: 6, &quot;deadline&quot;: 8},
+    {&quot;name&quot;: &quot;Collision-warning fusion&quot;, &quot;class&quot;: &quot;Hard&quot;, &quot;release&quot;: 2, &quot;exec&quot;: 5, &quot;deadline&quot;: 12},
+    {&quot;name&quot;: &quot;Trajectory replanning&quot;, &quot;class&quot;: &quot;Firm&quot;, &quot;release&quot;: 4, &quot;exec&quot;: 9, &quot;deadline&quot;: 14},
+    {&quot;name&quot;: &quot;HD map refresh&quot;, &quot;class&quot;: &quot;Firm&quot;, &quot;release&quot;: 7, &quot;exec&quot;: 12, &quot;deadline&quot;: 18},
+    {&quot;name&quot;: &quot;Cabin telemetry update&quot;, &quot;class&quot;: &quot;Soft&quot;, &quot;release&quot;: 8, &quot;exec&quot;: 15, &quot;deadline&quot;: 20},
+    {&quot;name&quot;: &quot;Video status stream&quot;, &quot;class&quot;: &quot;Soft&quot;, &quot;release&quot;: 10, &quot;exec&quot;: 18, &quot;deadline&quot;: 22},
+]
+
+clock = 0
+results = []
+for task in tasks:
+    start = max(clock, task[&quot;release&quot;])
+    finish = start + task[&quot;exec&quot;]
+    absolute_deadline = task[&quot;release&quot;] + task[&quot;deadline&quot;]
+    met = finish &lt;= absolute_deadline
+    results.append((task[&quot;name&quot;], task[&quot;class&quot;], start, finish, absolute_deadline, met))
+    clock = finish
+
+met_count = sum(1 for row in results if row[-1])
+miss_ratio = (len(results) - met_count) / len(results)
+for row in results:
+    print(row)
+print(&quot;deadline miss ratio =&quot;, round(miss_ratio, 2))</pre>
+
+        <h3>Data and Results</h3>
+        <table><thead><tr><th>Task</th><th>Class</th><th>Release (ms)</th><th>Exec (ms)</th><th>Abs. Deadline (ms)</th><th>Finish (ms)</th><th>Status</th></tr></thead><tbody><tr><td>Brake actuator command</td><td>Hard</td><td>0</td><td>6</td><td>8</td><td>6</td><td>Met</td></tr><tr><td>Collision-warning fusion</td><td>Hard</td><td>2</td><td>5</td><td>14</td><td>11</td><td>Met</td></tr><tr><td>Trajectory replanning</td><td>Firm</td><td>4</td><td>9</td><td>18</td><td>20</td><td>Missed</td></tr><tr><td>HD map refresh</td><td>Firm</td><td>7</td><td>12</td><td>25</td><td>32</td><td>Missed</td></tr><tr><td>Cabin telemetry update</td><td>Soft</td><td>8</td><td>15</td><td>28</td><td>47</td><td>Missed</td></tr><tr><td>Video status stream</td><td>Soft</td><td>10</td><td>18</td><td>32</td><td>65</td><td>Missed</td></tr></tbody></table>
+        <table><thead><tr><th>Class</th><th>Jobs</th><th>Met</th><th>Missed</th><th>Miss Ratio</th></tr></thead><tbody><tr><td>Hard</td><td>2</td><td>2</td><td>0</td><td>0.00</td></tr><tr><td>Firm</td><td>2</td><td>0</td><td>2</td><td>1.00</td></tr><tr><td>Soft</td><td>2</td><td>0</td><td>2</td><td>1.00</td></tr></tbody></table>
+
+        <h3>Analysis and Inferences</h3>
+        <ul><li>The two hard tasks meet deadlines in this run, so safety-critical outputs are delivered before they expire.</li><li>The firm tasks begin missing deadlines as queued work increases; their late results must be discarded.</li><li>The soft tasks also miss deadlines, but the results can still be used with reduced quality.</li><li>Deadline classification changes the interpretation of the same timing miss: unsafe for hard tasks, useless for firm tasks, and degraded for soft tasks.</li></ul>
+
+        <h3>Viva-Voce Questions and Answers</h3>
+        <p><b>1. What consequence distinguishes a hard deadline miss from a soft deadline miss?</b><br>A hard deadline miss can cause system failure or unsafe behaviour; a soft miss mainly reduces service quality.</p>
+        <p><b>2. How did your simulation detect that a deadline was missed?</b><br>It compared each job's finish time with its absolute deadline.</p>
+        <p><b>3. What Python constructs did you use to model task execution time?</b><br>Dictionaries stored task parameters, and loops simulated sequential execution.</p>
+        <p><b>4. How would increasing task execution time affect the deadline-miss ratio?</b><br>It increases processor demand and generally increases the miss ratio.</p>
+        <p><b>5. In an autonomous vehicle, which subsystems require hard real-time guarantees?</b><br>Emergency braking, stability control, steering actuation, and collision avoidance need hard guarantees because delay can directly affect safety.</p>
+
+        <h3>Post-Lab Questions and Answers</h3>
+        <p><b>1. Extend your simulation to run 100 randomly generated tasks with mixed timing classes; compute and plot the deadline-miss ratio for each class as system load increases from 40% to 120%. Interpret where each class begins to fail.</b></p>
+        <pre>import random
+
+def run_trial(load, seed=341401):
+    rng = random.Random(seed)
+    factors = {&quot;Hard&quot;: 1.75, &quot;Firm&quot;: 1.35, &quot;Soft&quot;: 1.25}
+    counts = {&quot;Hard&quot;: 0, &quot;Firm&quot;: 0, &quot;Soft&quot;: 0}
+    misses = {&quot;Hard&quot;: 0, &quot;Firm&quot;: 0, &quot;Soft&quot;: 0}
+    useful = {&quot;Hard&quot;: 0.0, &quot;Firm&quot;: 0.0, &quot;Soft&quot;: 0.0}
+
+    for i in range(100):
+        task_class = [&quot;Hard&quot;, &quot;Firm&quot;, &quot;Soft&quot;][i % 3]
+        base_exec = rng.uniform(4.0, 18.0)
+        actual_exec = base_exec * load * rng.uniform(0.90, 1.35)
+        deadline = base_exec * factors[task_class]
+        met = actual_exec &lt;= deadline
+        counts[task_class] += 1
+        misses[task_class] += 0 if met else 1
+        if met:
+            useful[task_class] += 1.0
+        elif task_class == &quot;Soft&quot;:
+            useful[task_class] += 0.55
+
+    return {
+        cls: (misses[cls] / counts[cls], useful[cls] / counts[cls])
+        for cls in counts
+    }
+
+for load in [0.40, 0.60, 0.80, 1.00, 1.20]:
+    print(load, run_trial(load))</pre>
+        <table><thead><tr><th>Load</th><th>Class</th><th>Miss Ratio</th><th>Useful Work Ratio</th><th>Text Plot</th></tr></thead><tbody><tr><td>40%</td><td>Hard</td><td>0.0</td><td>1.0</td><td>-</td></tr><tr><td>40%</td><td>Firm</td><td>0.0</td><td>1.0</td><td>-</td></tr><tr><td>40%</td><td>Soft</td><td>0.0</td><td>1.0</td><td>-</td></tr><tr><td>60%</td><td>Hard</td><td>0.0</td><td>1.0</td><td>-</td></tr><tr><td>60%</td><td>Firm</td><td>0.0</td><td>1.0</td><td>-</td></tr><tr><td>60%</td><td>Soft</td><td>0.0</td><td>1.0</td><td>-</td></tr><tr><td>80%</td><td>Hard</td><td>0.0</td><td>1.0</td><td>-</td></tr><tr><td>80%</td><td>Firm</td><td>0.0</td><td>1.0</td><td>-</td></tr><tr><td>80%</td><td>Soft</td><td>0.0</td><td>1.0</td><td>-</td></tr><tr><td>100%</td><td>Hard</td><td>0.0</td><td>1.0</td><td>-</td></tr><tr><td>100%</td><td>Firm</td><td>0.0</td><td>1.0</td><td>-</td></tr><tr><td>100%</td><td>Soft</td><td>0.18</td><td>0.92</td><td>##</td></tr><tr><td>120%</td><td>Hard</td><td>0.0</td><td>1.0</td><td>-</td></tr><tr><td>120%</td><td>Firm</td><td>0.48</td><td>0.52</td><td>#####</td></tr><tr><td>120%</td><td>Soft</td><td>0.82</td><td>0.63</td><td>########</td></tr></tbody></table>
+        <p><b>Interpretation:</b> At lower load all classes meet most deadlines. As load approaches and exceeds full utilisation, firm and soft tasks show more deadline misses. Hard tasks need admission control or higher priority before this point, because even a small hard-task miss rate is unacceptable.</p>
+        <p><b>2. Modify the model so that a firm task's late output is discarded while a soft task's late output is still accepted with a penalty. Quantify the effective useful work delivered by each class under overload.</b></p>
+        <p><b>Answer:</b> The useful-work ratio table above applies 1.00 credit for on-time results, 0.00 credit for missed hard or firm results, and 0.55 credit for missed soft results. Under overload, firm useful work drops sharply because late results are discarded, while soft useful work degrades gradually because late results still provide partial value.</p>
+        <h3>References</h3><ol><li>Python time module documentation: <a href="https://docs.python.org/3/library/time.html">https://docs.python.org/3/library/time.html</a></li><li>Python statistics module documentation: <a href="https://docs.python.org/3/library/statistics.html">https://docs.python.org/3/library/statistics.html</a></li><li>Python random module documentation: <a href="https://docs.python.org/3/library/random.html">https://docs.python.org/3/library/random.html</a></li></ol>
+        
+</body>
+</html>
