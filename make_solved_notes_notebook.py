@@ -13,7 +13,11 @@ def split_markdown_into_cells(text: str) -> list[str]:
     current: list[str] = []
 
     for line in text.splitlines():
-        starts_new_section = line.startswith("## ") or line.startswith("### ")
+        starts_new_section = (
+            line.startswith("## ")
+            or line.startswith("### ")
+            or line.startswith("**Question:**")
+        )
         if starts_new_section and current:
             cells.append("\n".join(current).strip() + "\n")
             current = []
