@@ -9,3 +9,4 @@ __pycache__/
 
 # Earlier combined notebook kept locally; current deliverable uses separate notebooks.
 exp1_exp2_executed.ipynb
+outputs/*_executed.ipynb
